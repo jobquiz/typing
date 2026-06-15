@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>TypingMuse | Auto error display | 70 WPM proof | No inline underlines</title>
+    <title>TypingMuse | Unlimited length | 70 WPM proof | No inline errors</title>
     <style>
         * {
             margin: 0;
@@ -239,8 +239,8 @@
 <div class="typing-app">
     <div class="header-flex">
         <div class="brand">
-            <h1>✍️ TypingMuse • Auto error display</h1>
-            <p>2000+ base passages | Concatenated for any duration | 70 WPM proof</p>
+            <h1>✍️ TypingMuse • Infinite length</h1>
+            <p>2000+ base passages | Auto‑concatenation for any duration | 70 WPM proof</p>
         </div>
         <div class="badge-extra" id="passageCountBadge">📚 2150+ base passages</div>
     </div>
@@ -259,7 +259,7 @@
         </div>
         <div style="display: flex; gap: 0.7rem;">
             <button class="start-test" id="startTestBtn">▶ START TEST</button>
-            <button class="error-highlight-btn" id="showErrorsBtn">🔍 Highlight Errors (manual)</button>
+            <button class="error-highlight-btn" id="showErrorsBtn">🔍 Highlight Errors</button>
         </div>
     </div>
 
@@ -271,19 +271,19 @@
     </div>
 
     <div class="passage-block">
-        <div class="passage-label">📖 MAIN PASSAGE (auto‑lengthened, no early finish)</div>
+        <div class="passage-label">📖 MAIN PASSAGE (auto‑lengthened for 70 WPM, no early finish)</div>
         <div class="passage-text" id="passageDisplay">Loading passage library...</div>
     </div>
 
-    <textarea id="userInput" placeholder="✍️ Type here – no red underlines. Press START TEST to begin." disabled></textarea>
+    <textarea id="userInput" placeholder="✍️ Type here – no error underlines. Press START TEST to begin." disabled></textarea>
 
-    <!-- Error panel: shows red marks automatically after test, and also via button -->
     <div id="errorHighlightPanel" style="display: none;" class="error-panel">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <strong>📌 ERROR DETECTOR — red = wrong character, yellow underline = missing, dotted = extra</strong>
+            <strong>📌 ERROR DETECTOR — character‑level mismatch (red = wrong)</strong>
             <button id="closeErrorPanel" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">✖</button>
         </div>
         <div id="errorComparisonContent"></div>
+        <div style="font-size: 0.8rem; margin-top: 10px;">🔴 Red = wrong character &nbsp;|&nbsp; 🟡 Yellow underline = missing &nbsp;|&nbsp; 🟤 Dotted = extra</div>
     </div>
 
     <div class="result-card" id="resultPanel" style="display: none;">
@@ -302,9 +302,9 @@
         <table id="historyTable">
             <thead><tr><th>Date & Time</th><th>Language</th><th>WPM</th><th>Accuracy%</th><th>Wrong Words</th><th>Wrong %</th><th>Result</th></tr></thead>
             <tbody id="historyBody"><tr><td colspan="7">✨ No attempts yet. Start a test!</td></tr></tbody>
-        </table>
+        }</table>
     </div>
-    <div class="footer-note">⭐ PASS if accuracy ≥ 96% • WPM = (correct non‑space chars /5) / minutes • After each test, errors are automatically shown in red.</div>
+    <div class="footer-note">⭐ PASS if accuracy ≥ 96% • WPM = (correct non‑space chars /5) / minutes • Passage length guarantees a 70 WPM typist cannot finish early.</div>
 </div>
 
 <script>
@@ -340,7 +340,7 @@
             "তথ্যপ্রযুক্তি রপ্তানি আয় বাড়ছে। 'লিভারেজিং আইসিটি' শীর্ষক সম্মেলনে বৈশ্বিক বিনিয়োগকারীরা বাংলাদেশের স্টার্টআপ ইকোসিস্টেমে আগ্রহ দেখিয়েছেন। ভোক্তা থেকে কর্পোরেট ডিজিটালাইজেশন দ্রুত সম্প্রসারিত হচ্ছে।"
         ];
 
-        // English >2000
+        // Generate English >2000 unique passages
         for (let i = 0; i < 1500; i++) {
             const base = enTemplates[i % enTemplates.length];
             const suffix = ` (Global topic ${Math.floor(i/10)}): Digital transformation, green energy, and resilient economies. Bangladesh leads climate adaptation.`;
@@ -352,7 +352,7 @@
             englishSet.add(`Unique passage #${englishSet.size}: The rapid adoption of 5G and IoT transforms smart cities. In Bangladesh, the government launches ‘Smart Bangladesh’ task force. Digital connectivity reaches remote villages.`);
         }
 
-        // Bangla >1400
+        // Generate Bangla >1400 unique passages
         for (let i = 0; i < 1200; i++) {
             const baseBn = bnTemplates[i % bnTemplates.length];
             const addon = ` বাংলাদেশের উন্নয়নশীল অর্থনীতি ও প্রযুক্তি খাত ${i}. ডিজিটাল উদ্ভাবন ও জলবায়ু সহনশীলতা দেশের অগ্রগতিতে গুরুত্বপূর্ণ ভূমিকা রাখছে।`;
@@ -368,59 +368,61 @@
     }
 
     const basePools = generateLargePassagePool();
-    const ENGLISH_BASE = basePools.en;
-    const BANGLA_BASE = basePools.bn;
+    const ENGLISH_BASE = basePools.en;   // >2100 unique
+    const BANGLA_BASE = basePools.bn;    // >1500 unique
+
     document.getElementById("passageCountBadge").innerHTML = `📚 ${ENGLISH_BASE.length + BANGLA_BASE.length}+ base passages`;
 
     function getNonSpaceLen(str) {
         return (str.match(/[^ ]/g) || []).length;
     }
 
-    // Required minimum non‑space characters for a 70 WPM typist to not finish early
+    // 70 WPM => 350 non‑space chars per minute.
     function getRequiredMinLength(minutes) {
-        return 70 * 5 * minutes;   // 350 chars per minute
+        return 70 * 5 * minutes;   // = 350 * minutes
     }
 
-    // Build passage by concatenating random base passages until length >= required
-    let lastUsedFullPassage = { english: null, bangla: null };
+    // Build a passage that is guaranteed to have at least `minLen` non‑space characters
+    // by concatenating random unique base passages (with spaces between) until the threshold is met.
+    // Also avoids repeating the same passage in consecutive concatenations for the same language.
+    let lastUsedPassages = { english: null, bangla: null };
 
     function buildLongPassage(lang, minutes) {
         const baseArray = lang === 'english' ? ENGLISH_BASE : BANGLA_BASE;
-        const required = getRequiredMinLength(minutes);
+        const requiredMin = getRequiredMinLength(minutes);
         let parts = [];
         let totalNonSpace = 0;
         let usedIndices = new Set();
-        let attempts = 0;
         const maxAttempts = 100;
+        let attempts = 0;
         
-        while (totalNonSpace < required && attempts < maxAttempts) {
-            let idx;
+        // Avoid using the last whole passage as the first part (to prevent immediate repetition)
+        let lastWhole = lastUsedPassages[lang];
+        
+        while (totalNonSpace < requiredMin && attempts < maxAttempts) {
+            let randomIndex;
             do {
-                idx = Math.floor(Math.random() * baseArray.length);
-            } while (usedIndices.has(idx));
-            const chosen = baseArray[idx];
-            usedIndices.add(idx);
+                randomIndex = Math.floor(Math.random() * baseArray.length);
+            } while (usedIndices.has(randomIndex) || (parts.length === 0 && lastWhole !== null && baseArray[randomIndex] === lastWhole));
+            const chosen = baseArray[randomIndex];
+            usedIndices.add(randomIndex);
             parts.push(chosen);
             totalNonSpace += getNonSpaceLen(chosen);
             attempts++;
-            if (usedIndices.size >= baseArray.length * 0.8) usedIndices.clear();
-        }
-        let finalText = parts.join("  ");
-        // Avoid immediate repetition of the exact same concatenation
-        const last = lastUsedFullPassage[lang];
-        if (last === finalText && baseArray.length > 1) {
-            // swap two parts slightly
-            if (parts.length >= 2) {
-                [parts[0], parts[1]] = [parts[1], parts[0]];
-                finalText = parts.join("  ");
+            // If we have added many parts but still below threshold, reset usedIndices to allow repeats (but avoid immediate same)
+            if (usedIndices.size >= baseArray.length * 0.8) {
+                usedIndices.clear();
             }
         }
-        lastUsedFullPassage[lang] = finalText;
-        return finalText;
+        
+        const finalPassage = parts.join("  ");
+        // Store the full passage as the last used to avoid exact same next time
+        lastUsedPassages[lang] = finalPassage;
+        return finalPassage;
     }
 
     // --------------------------------------------------------------
-    // APP STATE
+    // APP STATE (no inline error underlines – purely result based)
     // --------------------------------------------------------------
     let currentLang = "english";
     let currentDurationMin = 3;
@@ -430,7 +432,7 @@
     let timerInterval = null, wpmInterval = null;
     let testHistory = [];
 
-    // DOM
+    // DOM elements
     const passageDisplayDiv = document.getElementById("passageDisplay");
     const userTextarea = document.getElementById("userInput");
     const startBtn = document.getElementById("startTestBtn");
@@ -474,7 +476,7 @@
         });
         timeLeftSeconds = minutes * 60;
         updateTimerUI();
-        refreshPassage();   // new, sufficiently long passage
+        refreshPassage();   // generates a new, long-enough passage
         clearResultAndError();
         disableTypingReset();
     }
@@ -507,32 +509,6 @@
         return { wpm, accuracy, wrongWords, wrongPercent, totalWords: originalWords.length };
     }
 
-    // Shared function to generate error highlight HTML
-    function generateErrorHtml(typed, original) {
-        let originalRich = "";
-        for (let i = 0; i < original.length; i++) {
-            const origChar = original[i];
-            const typedChar = i < typed.length ? typed[i] : null;
-            if (typedChar === null) originalRich += `<span class="missing-highlight" title="missing typed character">${escapeHtml(origChar)}</span>`;
-            else if (origChar === typedChar) originalRich += escapeHtml(origChar);
-            else originalRich += `<span class="highlight-error" title="mismatch: typed '${escapeHtml(typedChar)}'">${escapeHtml(origChar)}</span>`;
-        }
-        if (typed.length > original.length) {
-            originalRich += `<span class="extra-highlight" title="extra characters typed">${escapeHtml(typed.slice(original.length))}</span>`;
-        }
-        return `<div style="font-family:'Times New Roman', Times, serif; font-size:1.2rem;">
-            <div style="background:#fef2e0; padding:1rem; border-radius:1rem;">${originalRich}</div>
-            <div style="margin-top:0.8rem;"><strong>✍️ Your typed text:</strong><br><span style="background:#f5f5f5; padding:0.5rem; display:inline-block;">${escapeHtml(typed) || '(empty)'}</span></div>
-            </div>`;
-    }
-
-    function showErrorHighlight(typed, original) {
-        if (!original) return;
-        const html = generateErrorHtml(typed, original);
-        errorComparisonContent.innerHTML = html;
-        errorPanel.style.display = "block";
-    }
-
     function endTest() {
         if (!testActive) return;
         testActive = false;
@@ -542,21 +518,13 @@
         const original = currentPassageText;
         const { wpm, accuracy, wrongWords, wrongPercent, totalWords } = computeStats(typed, original, currentDurationMin);
         const passed = accuracy >= 96.0;
-        
-        // Show result panel
         resultPanel.style.display = "block";
         resultDetails.innerHTML = `<div class="result-flex"><div class="stat-pill">⚡ WPM: ${wpm}</div><div class="stat-pill">🎯 Accuracy: ${accuracy}%</div><div class="stat-pill">❌ Wrong words: ${wrongWords}</div><div class="stat-pill">⚠️ Error %: ${wrongPercent}%</div><div class="stat-pill">📄 Words: ${totalWords}</div></div><div class="verdict-big ${passed ? 'pass' : 'fail'}">${passed ? '✅ PASS · Excellent!' : '❌ FAIL · Keep practicing'}</div>`;
-        
-        // Automatically show error highlight panel
-        showErrorHighlight(typed, original);
-        
-        // Save to history
         const now = new Date();
         const dateStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
         testHistory.unshift({ datetime: dateStr, language: currentLang === 'english' ? 'English' : 'বাংলা', wpm, accuracy, wrongWords, wrongPercent, result: passed ? 'PASS' : 'FAIL' });
         if (testHistory.length > 20) testHistory.pop();
         renderHistory();
-        
         userTextarea.disabled = true;
         enableControls(true);
         startBtn.disabled = false;
@@ -597,6 +565,7 @@
         if (wpmInterval) clearInterval(wpmInterval);
         timeLeftSeconds = currentDurationMin * 60;
         updateTimerUI();
+        // generate a fresh, sufficiently long passage for the chosen duration
         currentPassageText = buildLongPassage(currentLang, currentDurationMin);
         passageDisplayDiv.innerText = currentPassageText;
         userTextarea.disabled = false;
@@ -615,10 +584,28 @@
         wpmInterval = setInterval(() => { if(testActive) updateLiveWpm(); }, 400);
     }
 
-    // Manual error highlight (if user wants to see again)
-    function manualHighlight() {
+    // Error highlight – shows red marks ONLY in this panel, never in textarea
+    function showErrorHighlight() {
         if (!currentPassageText) return;
-        showErrorHighlight(userTextarea.value, currentPassageText);
+        const typed = userTextarea.value;
+        const original = currentPassageText;
+        let originalRich = "";
+        for (let i = 0; i < original.length; i++) {
+            const origChar = original[i];
+            const typedChar = i < typed.length ? typed[i] : null;
+            if (typedChar === null) originalRich += `<span class="missing-highlight" title="missing typed character">${escapeHtml(origChar)}</span>`;
+            else if (origChar === typedChar) originalRich += escapeHtml(origChar);
+            else originalRich += `<span class="highlight-error" title="mismatch: typed '${escapeHtml(typedChar)}'">${escapeHtml(origChar)}</span>`;
+        }
+        if (typed.length > original.length) {
+            originalRich += `<span class="extra-highlight" title="extra characters typed">${escapeHtml(typed.slice(original.length))}</span>`;
+        }
+        const resultHtml = `<div style="font-family:'Times New Roman', Times, serif; font-size:1.2rem;"><strong>🔍 Original passage with mismatches (red/wrong):</strong><br>
+            <div style="background:#fef2e0; padding:1rem; border-radius:1rem;">${originalRich}</div>
+            <div style="margin-top:0.8rem;"><strong>✍️ Your typed text:</strong><br><span style="background:#f5f5f5; padding:0.5rem; display:inline-block;">${escapeHtml(typed) || '(empty)'}</span></div>
+            </div>`;
+        errorComparisonContent.innerHTML = resultHtml;
+        errorPanel.style.display = "block";
     }
 
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
@@ -632,9 +619,9 @@
     });
     startBtn.addEventListener("click", startNewTest);
     deleteAllBtn.addEventListener("click", deleteAllHistory);
-    closeResult.addEventListener("click", () => resultPanel.style.display = "none");
-    closeErrorPanel.addEventListener("click", () => errorPanel.style.display = "none");
-    showErrorsBtn.addEventListener("click", manualHighlight);
+    if(closeResult) closeResult.addEventListener("click", () => resultPanel.style.display = "none");
+    if(closeErrorPanel) closeErrorPanel.addEventListener("click", () => errorPanel.style.display = "none");
+    showErrorsBtn.addEventListener("click", showErrorHighlight);
 
     // Initialization
     setLanguage("english");
