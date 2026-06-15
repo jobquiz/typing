@@ -2,639 +2,484 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>TypingMuse | 70 WPM Optimized | Auto Error Display</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypingBD Clone - Advanced Practice</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600&family=Poppins:wght@400;600&display=swap');
+
+        :root {
+            --bg-color: #f4f6f9;
+            --white: #ffffff;
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --danger: #e74a3b;
+            --text-dark: #333;
+            --text-light: #6c757d;
+            --border: #e3e6f0;
         }
 
         body {
-            background: linear-gradient(130deg, #e9eef4 0%, #dce3ec 100%);
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
-            padding: 2rem 1.5rem;
-            min-height: 100vh;
+            font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
         }
 
-        .typing-app {
-            max-width: 1400px;
+        .container {
+            max-width: 1000px;
             margin: 0 auto;
-            background: #fffef7;
-            border-radius: 2.2rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            padding: 1.8rem 2rem 2rem 2rem;
         }
 
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 1.8rem;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 1rem;
-        }
-        .brand h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1f3b4c, #2c5a7a);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .badge-extra {
-            background: #1e2f3e;
-            padding: 0.4rem 1rem;
-            border-radius: 3rem;
-            color: #f1f9ff;
-            font-weight: 600;
-            font-size: 0.8rem;
+        .card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
 
-        .control-strip {
-            background: #f7fafd;
-            border-radius: 4rem;
-            padding: 0.6rem 1.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
         }
-        .lang-group, .time-group {
-            display: flex;
-            gap: 0.7rem;
-            align-items: center;
-            flex-wrap: wrap;
+
+        /* Dashboard Styles */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
-        .ctrl-chip {
-            background: white;
-            border: 1px solid #cbdde9;
-            padding: 0.4rem 1.2rem;
-            border-radius: 3rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
+
+        .test-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #fff;
         }
-        .ctrl-chip.active {
-            background: #1e4a76;
-            border-color: #1e4a76;
-            color: white;
-        }
-        .start-test {
-            background: #10b981;
+
+        .btn {
+            padding: 10px 20px;
             border: none;
-            padding: 0.5rem 2rem;
-            border-radius: 3rem;
-            font-weight: 700;
-            color: white;
+            border-radius: 5px;
             cursor: pointer;
-            transition: 0.2s;
-        }
-        .error-highlight-btn {
-            background: #f59e0b;
-            border: none;
-            padding: 0.5rem 1.4rem;
-            border-radius: 3rem;
-            font-weight: 700;
-            color: #2c2c2c;
-            cursor: pointer;
-            margin-left: 0.5rem;
-        }
-        .start-test:disabled, .error-highlight-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
+            font-weight: 600;
+            color: var(--white);
+            transition: 0.3s;
+            margin: 5px;
         }
 
-        .live-stats {
+        .btn-bangla { background-color: var(--success); }
+        .btn-english { background-color: #36b9cc; }
+        .btn-finish { background-color: var(--primary); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-secondary { background-color: var(--text-light); }
+
+        /* Typing Area Styles */
+        .timer-bar {
             display: flex;
             justify-content: space-between;
-            background: #eef3fc;
-            backdrop-filter: blur(8px);
-            padding: 0.6rem 1.8rem;
-            border-radius: 3rem;
-            margin-bottom: 1.8rem;
-            font-weight: 700;
-        }
-        .timer-card, .wpm-card {
-            background: #0b2f33;
-            padding: 0.2rem 1rem;
-            border-radius: 3rem;
-            color: #ffe484;
-            font-family: monospace;
-            font-size: 1.6rem;
+            align-items: center;
+            background: var(--white);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+            font-weight: bold;
         }
 
-        .passage-block {
-            background: #fefcf5;
-            border-radius: 1.8rem;
-            padding: 1.6rem;
-            margin-bottom: 1.8rem;
-            border: 1px solid #e9edf2;
-            max-height: 400px;
+        .passage-box {
+            background: #f8f9fc;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            user-select: none;
+            max-height: 250px;
             overflow-y: auto;
-        }
-        .passage-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #5e7e9e;
-            margin-bottom: 1rem;
-        }
-        .passage-text {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.4rem;
-            line-height: 1.65;
-            color: #1a2c3c;
-            font-weight: 500;
-            word-break: break-word;
         }
 
         textarea {
             width: 100%;
-            height: 210px;
-            padding: 1.2rem 1.5rem;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.3rem;
-            line-height: 1.55;
-            background: #ffffff;
-            border: 2px solid #dce5ef;
-            border-radius: 1.8rem;
-            resize: vertical;
-            outline: none;
-            transition: 0.2s;
-        }
-        textarea:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px #3b82f630;
-        }
-        textarea:disabled {
-            background: #f1f5f9;
-            color: #4b5a6b;
+            height: 150px;
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            box-sizing: border-box;
+            resize: none;
+            font-family: inherit;
         }
 
-        .error-panel {
-            background: #fff7e5;
-            border-radius: 1.8rem;
-            padding: 1.2rem 1.5rem;
-            margin: 1rem 0 1.2rem 0;
-            border-left: 8px solid #f59e0b;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            max-height: 320px;
-            overflow-y: auto;
+        /* Results Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .highlight-error {
-            background-color: #ffcccc;
-            color: #a00000;
-            border-radius: 3px;
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f8f9fc;
+            color: var(--text-light);
             font-weight: 600;
         }
-        .missing-highlight {
-            background-color: #ffdd99;
+
+        .error-text {
+            color: var(--danger);
             text-decoration: underline;
-            color: #aa5500;
-        }
-        .extra-highlight {
-            background-color: #ffe0b5;
-            border-bottom: 2px dotted #f97316;
         }
 
-        .result-card {
-            background: #eef3fc;
-            border-radius: 1.8rem;
-            padding: 1.2rem;
-            margin: 1rem 0;
+        .result-summary {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        .result-flex { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.5rem 0; }
-        .stat-pill { background: white; border-radius: 2rem; padding: 0.3rem 1rem; font-weight: 600; }
-        .verdict-big { font-size: 1.5rem; font-weight: 800; margin-top: 0.5rem; }
-        .pass { color: #0b5e42; }
-        .fail { color: #b91c1c; }
 
-        .history-section { margin-top: 1.6rem; }
-        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
-        .delete-btn { background: #ef4444; border: none; padding: 0.3rem 1rem; border-radius: 2rem; color: white; font-weight: 600; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 1.5rem; overflow: hidden; }
-        th, td { padding: 10px 6px; text-align: center; border-bottom: 1px solid #e2edf2; }
-        th { background: #1e2f3e; color: white; }
-        .footer-note { text-align: center; font-size: 0.7rem; margin-top: 1.5rem; color: #5b6e82; }
-        button { cursor: pointer; }
+        .summary-box {
+            flex: 1;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background: #f8f9fc;
+        }
 
-        @media (max-width: 720px) {
-            .typing-app { padding: 1rem; }
-            .passage-text { font-size: 1.1rem; }
-            textarea { font-size: 1rem; }
+        .comparison-box {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            margin-top: 10px;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
-<div class="typing-app">
-    <div class="header-flex">
-        <div class="brand">
-            <h1>✍️ TypingMuse • 70 WPM Optimized</h1>
-            <p>2000+ base passages | Auto error highlight | No inline underlines</p>
-        </div>
-        <div class="badge-extra" id="passageCountBadge">📚 2150+ base passages</div>
+
+<div class="container">
+    <div class="header">
+        <h2>Advanced Typing Practice Portal</h2>
     </div>
 
-    <div class="control-strip">
-        <div class="lang-group">
-            <span class="ctrl-chip" data-lang="bangla" id="langBangla">🇧🇩 বাংলা</span>
-            <span class="ctrl-chip active" data-lang="english" id="langEnglish">🌍 ENGLISH</span>
+    <!-- 1. Dashboard View -->
+    <div id="dashboard-view">
+        <div class="grid-cards">
+            <div class="test-card">
+                <h3>৩ মিনিট টাইপ</h3>
+                <p>Trial Mode</p>
+                <button class="btn btn-bangla" onclick="startTest('bangla', 3)">Bangla</button>
+                <button class="btn btn-english" onclick="startTest('english', 3)">English</button>
+            </div>
+            <div class="test-card">
+                <h3>৫ মিনিট টাইপ</h3>
+                <p>Practice Mode</p>
+                <button class="btn btn-bangla" onclick="startTest('bangla', 5)">Bangla</button>
+                <button class="btn btn-english" onclick="startTest('english', 5)">English</button>
+            </div>
+            <div class="test-card">
+                <h3>১০ মিনিট টাইপ</h3>
+                <p>Exam Mode</p>
+                <button class="btn btn-bangla" onclick="startTest('bangla', 10)">Bangla</button>
+                <button class="btn btn-english" onclick="startTest('english', 10)">English</button>
+            </div>
         </div>
-        <div class="time-group">
-            <span class="ctrl-chip" data-time="1">1 min</span>
-            <span class="ctrl-chip" data-time="2">2 min</span>
-            <span class="ctrl-chip active" data-time="3">3 min</span>
-            <span class="ctrl-chip" data-time="5">5 min</span>
-            <span class="ctrl-chip" data-time="10">10 min</span>
-        </div>
-        <div style="display: flex; gap: 0.7rem;">
-            <button class="start-test" id="startTestBtn">▶ START TEST</button>
-            <button class="error-highlight-btn" id="showErrorsBtn">🔍 Highlight Errors (manual)</button>
+        
+        <div class="card" style="margin-top: 30px;">
+            <h3>My Results</h3>
+            <button class="btn btn-danger" onclick="clearHistory()">Delete All Results</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>DATE & TIME</th>
+                        <th>LANGUAGE</th>
+                        <th>WPM</th>
+                        <th>ACCURACY</th>
+                        <th>SPEND TIME</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body">
+                    <!-- Data will be loaded here via JS -->
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="live-stats">
-        <span>⏱️ TIME REMAINING</span>
-        <span class="timer-card" id="timerDisplay">03:00</span>
-        <span>⚡ LIVE WPM (no spaces)</span>
-        <span class="wpm-card" id="liveWpm">0</span>
-    </div>
-
-    <div class="passage-block">
-        <div class="passage-label">📖 MAIN PASSAGE (auto‑lengthened, no early finish)</div>
-        <div class="passage-text" id="passageDisplay">Loading passage library...</div>
-    </div>
-
-    <textarea id="userInput" placeholder="✍️ Type here – no red underlines. Press START TEST to begin." disabled></textarea>
-
-    <div id="errorHighlightPanel" style="display: none;" class="error-panel">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <strong>📌 ERROR DETECTOR — red = wrong, yellow underline = missing, dotted = extra</strong>
-            <button id="closeErrorPanel" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">✖</button>
+    <!-- 2. Typing Test View -->
+    <div id="typing-view" style="display: none;">
+        <div class="timer-bar">
+            <span id="timer-display">সময়: 00:00 মিনিট</span>
+            <button class="btn btn-finish" onclick="finishTest()">Go to Finish</button>
         </div>
-        <div id="errorComparisonContent"></div>
+        <div class="passage-box" id="original-passage"></div>
+        <textarea id="user-input" placeholder="Start writing here..." onpaste="return false;" autocomplete="off"></textarea>
     </div>
 
-    <div class="result-card" id="resultPanel" style="display: none;">
-        <div style="display: flex; justify-content: space-between;">
-            <h3>📊 Test Result</h3>
-            <button id="closeResultBtn" style="background: none; border: none; font-size:1.2rem;">✖</button>
+    <!-- 3. Result View -->
+    <div id="result-view" style="display: none;" class="card">
+        <h2 style="text-align:center; color: var(--success);">CHECKING MY RESULT</h2>
+        
+        <div class="result-summary">
+            <div class="summary-box">
+                <p><strong>ভাষা:</strong> <span id="res-lang"></span></p>
+                <p><strong>সময়কাল:</strong> <span id="res-time"></span></p>
+            </div>
+            <div class="summary-box">
+                <p><strong>প্রতি মিনিটে (WPM):</strong> <span id="res-wpm" style="color:var(--danger); font-weight:bold;"></span></p>
+                <p><strong>Accuracy:</strong> <span id="res-acc" style="color:var(--success); font-weight:bold;"></span></p>
+                <p><em>৫ Stroke = 1 Word হিসেবে</em></p>
+            </div>
+            <div class="summary-box">
+                <p><strong>মোট টাইপ করা ক্যারেক্টার:</strong> <span id="res-total-char"></span></p>
+                <p><strong>সঠিক ক্যারেক্টার:</strong> <span id="res-correct-char"></span></p>
+                <p><strong>ভুল শব্দ:</strong> <span id="res-wrong-words"></span></p>
+            </div>
         </div>
-        <div id="resultDetails"></div>
+
+        <h3>আপনার লেখা ও মূল Passage Comparison:</h3>
+        <p><strong>আপনার লেখা (ভুলগুলো লাল চিহ্নিত):</strong></p>
+        <div id="comparison-output" class="comparison-box"></div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-secondary" onclick="goHome()">Back to Home</button>
+        </div>
     </div>
 
-    <div class="history-section">
-        <div class="history-header">
-            <h3>📜 Recent Attempts</h3>
-            <button id="deleteAllHistoryBtn" class="delete-btn">🗑️ Delete all</button>
-        </div>
-        <table id="historyTable">
-            <thead><tr><th>Date & Time</th><th>Language</th><th>WPM</th><th>Accuracy%</th><th>Wrong Words</th><th>Wrong %</th><th>Result</th></tr></thead>
-            <tbody id="historyBody"><tr><td colspan="7">✨ No attempts yet. Start a test!</td></tr></tbody>
-        </table>
-    </div>
-    <div class="footer-note">⭐ PASS if accuracy ≥ 96% • WPM = (correct non‑space chars /5) / minutes • After each test, errors are shown automatically in red.</div>
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // 1. BUILD 2000+ UNIQUE BASE PASSAGES (English + Bangla)
-    // --------------------------------------------------------------
-    function generateLargePassagePool() {
-        const englishSet = new Set();
-        const banglaSet = new Set();
+    // ==========================================
+    // PASSAGE DATABASE (Add your 2000+ passages here)
+    // ==========================================
+    
+    const passagesData = {
+        english: [
+            "Bangladesh, a nation born out of a profound struggle for independence in 1971, has emerged as a remarkable example of resilience and economic growth in South Asia. Despite facing numerous challenges including devastating natural disasters, political shifts, and a massive population density, the country has made significant strides in poverty reduction, health, and education. The garment industry, which is the backbone of the economy, employs millions of workers, primarily women, empowering them and transforming the socio-economic landscape. In recent years, Bangladesh has also been investing heavily in massive infrastructure projects like the Padma Bridge and the Metro Rail in Dhaka, signaling a strong commitment to modernization and regional connectivity. As the world deals with unprecedented economic shifts, Bangladesh continues to adapt, aiming to graduate from the Least Developed Countries status and moving towards becoming a middle-income nation by the end of the decade.",
+            
+            "The rapid advancement of Artificial Intelligence (AI) and Machine Learning technologies has fundamentally reshaped the global landscape, influencing everything from healthcare and education to finance and national security. In recent years, generative AI models have demonstrated an uncanny ability to process natural language, create art, and write complex code, sparking intense debates about the future of human labor and creativity. While optimists argue that AI will augment human capabilities, automate mundane tasks, and solve complex global challenges such as climate change modeling and disease prediction, critics warn of severe ethical implications. Issues concerning algorithmic bias, data privacy, and the potential for autonomous weapons systems require immediate international regulatory frameworks. As AI systems become more integrated into critical infrastructure, ensuring robust cybersecurity measures and maintaining human oversight will be paramount.",
+            
+            "Climate change remains the most pressing existential threat facing humanity in the 21st century. The continuous emission of greenhouse gases, primarily from the burning of fossil fuels and massive deforestation, has led to a steady rise in global temperatures, resulting in extreme weather events worldwide. Nations around the globe are witnessing unprecedented heatwaves, devastating floods, and prolonged droughts that disrupt agricultural supply chains and displace vulnerable communities. The historic Paris Agreement aimed to unite the international community in limiting global warming to well below 2 degrees Celsius compared to pre-industrial levels, yet recent data suggests that current commitments fall dangerously short. Transitioning to renewable energy sources such as solar, wind, and geothermal power is no longer just an environmental imperative but an economic necessity."
+        ],
+        bangla: [
+            "বাংলাদেশের মুক্তিযুদ্ধ শুধু একটি সশস্ত্র সংগ্রাম ছিল না, এটি ছিল একটি জাতির দীর্ঘদিনের শোষণ ও বঞ্চনার বিরুদ্ধে রুখে দাঁড়ানোর চূড়ান্ত বহিঃপ্রকাশ। ১৯৭১ সালের ২৬শে মার্চ স্বাধীনতা ঘোষণার পর থেকে দীর্ঘ নয় মাস রক্তক্ষয়ী যুদ্ধের মাধ্যমে এদেশের মুক্তিকামী মানুষ পাকিস্তানি হানাদার বাহিনীর বিরুদ্ধে জয়লাভ করে। ত্রিশ লাখ শহীদের আত্মত্যাগ এবং দুই লাখ মা-বোনের সম্ভ্রমের বিনিময়ে অর্জিত এই স্বাধীনতা আমাদের অহংকার। স্বাধীনতা পরবর্তী সময়ে যুদ্ধবিধ্বস্ত একটি দেশ থেকে আজকের উদীয়মান অর্থনীতির দেশ হিসেবে বাংলাদেশের উত্থান সত্যি বিস্ময়কর। কৃষি, শিল্প, পোশাক খাত এবং প্রবাসী আয়ের ওপর ভর করে বাংলাদেশ আজ বিশ্বের দরবারে উন্নয়নের এক রোল মডেল হিসেবে পরিচিতি পেয়েছে। পদ্মা সেতু, মেট্রোরেল, কর্ণফুলী টানেল এবং রূপপুর পারমাণবিক বিদ্যুৎকেন্দ্রের মতো মেগা প্রকল্পগুলো দেশের যোগাযোগ ও অবকাঠামো খাতে এক যুগান্তকারী পরিবর্তন এনেছে।",
+            
+            "বর্তমান বিশ্বে তথ্যপ্রযুক্তি এবং কৃত্রিম বুদ্ধিমত্তা বা আর্টিফিশিয়াল ইন্টেলিজেন্স (এআই) এক অভাবনীয় বিপ্লব ঘটিয়েছে। মানুষের দৈনন্দিন জীবনের প্রায় প্রতিটি ক্ষেত্রে এখন প্রযুক্তির ছোঁয়া লেগেছে। চিকিৎসা বিজ্ঞান থেকে শুরু করে মহাকাশ গবেষণা, যোগাযোগ ব্যবস্থা, ব্যাংকিং খাত এমনকি শিক্ষাক্ষেত্রেও এআই-এর ব্যবহার দিন দিন বৃদ্ধি পাচ্ছে। তবে প্রযুক্তির এই অবাধ ব্যবহারের কিছু নেতিবাচক দিকও রয়েছে। সাইবার নিরাপত্তা, ব্যক্তিগত তথ্যের গোপনীয়তা এবং সাইবার ক্রাইম বর্তমান সময়ের অন্যতম বড় চ্যালেঞ্জ। বিশেষ করে ডিপফেক প্রযুক্তি এবং ফেক নিউজের ছড়াছড়ি সমাজ ব্যবস্থায় গভীর প্রভাব ফেলছে। তাই প্রযুক্তির সঠিক ও নিরাপদ ব্যবহার নিশ্চিত করতে আন্তর্জাতিক পর্যায়ে কঠোর সাইবার আইন ও নীতিমালা প্রণয়নের দাবি জোরালো হচ্ছে। আগামীর বিশ্ব হবে পুরোপুরি ডেটা নির্ভর, তাই এই প্রতিযোগিতায় টিকে থাকতে হলে প্রযুক্তিগত শিক্ষার কোনো বিকল্প নেই।",
+            
+            "বিশ্ব উষ্ণায়ন বা গ্লোবাল ওয়ার্মিং বর্তমান শতাব্দীর অন্যতম প্রধান বৈশ্বিক সংকট। কার্বন ডাই-অক্সাইড, মিথেনসহ অন্যান্য গ্রিনহাউস গ্যাসের মাত্রাতিরিক্ত নিঃসরণের ফলে পৃথিবীর তাপমাত্রা ক্রমাগত বৃদ্ধি পাচ্ছে। এর ফলে মেরু অঞ্চলের বরফ গলে সমুদ্রপৃষ্ঠের উচ্চতা বৃদ্ধি পাচ্ছে, যা বাংলাদেশ, মালদ্বীপসহ বিশ্বের অনেক উপকূলীয় দেশের জন্য এক অশনি সংকেত। জলবায়ু পরিবর্তনের কারণে বন্যা, খরা, ঘূর্ণিঝড় ও জলোচ্ছ্বাসের মতো প্রাকৃতিক দুর্যোগের মাত্রা ও তীব্রতা বহুগুণ বৃদ্ধি পেয়েছে। কৃষিকাজের ওপর এর বিরূপ প্রভাব পড়ছে, ফলে বিশ্বব্যাপী খাদ্য নিরাপত্তার ঝুঁকি তৈরি হচ্ছে। পরিবেশের এই চরম বিপর্যয় রোধ করতে হলে জীবাশ্ম জ্বালানির ব্যবহার কমিয়ে নবায়নযোগ্য জ্বালানি যেমন- সৌরশক্তি ও বায়ুশক্তির ব্যবহার বাড়াতে হবে। একইসাথে প্রচুর পরিমাণে বৃক্ষরোপণ এবং পরিবেশ রক্ষায় আন্তর্জাতিক চুক্তিগুলোর যথাযথ বাস্তবায়ন অত্যন্ত জরুরি।"
+        ]
+    };
 
-        const enTemplates = [
-            "Artificial intelligence is reshaping global economies and labor markets. In 2025, generative AI tools have become mainstream, revolutionizing creative industries and software development. Ethical concerns about deepfakes continue to challenge policymakers worldwide.",
-            "Climate change has accelerated extreme weather events globally. From wildfires in Canada to floods in Pakistan, nations are struggling to adapt. The recent COP29 summit emphasized loss and damage funds, but developing countries demand faster action.",
-            "Bangladesh is emerging as a $500 billion economy, driven by the garments sector, remittances, and digital innovation. The Padma Bridge, inaugurated in 2022, has transformed regional connectivity and boosted trade. Dhaka's metro rail is reducing traffic congestion gradually.",
-            "The global semiconductor industry faces supply chain shifts. TSMC and Intel are building new fabs in the US and Europe, while Bangladesh eyes its first chip assembly unit to attract high-tech investment. This could create thousands of jobs.",
-            "The war in Ukraine and the Israel-Hamas conflict have reshaped geopolitical alliances. Energy security and food inflation remain pressing issues for South Asia, including Bangladesh, which relies on imported fuel and wheat. Diplomacy is key.",
-            "In 2025, NASA and SpaceX plan the first crewed mission to Mars orbit. Meanwhile, China's lunar base project advances. Space exploration inspires a new generation of scientists, and Bangladesh's first satellite Bangabandhu-1 continues providing telecom services.",
-            "Bangladesh's 'Smart Bangladesh' vision 2041 focuses on digital governance, 4IR skills, and sustainable development. Young entrepreneurs are leading fintech and e-commerce growth, with platforms like ShopUp and Chaldal expanding rapidly across the nation.",
-            "Rohingya humanitarian crisis: Over 1 million refugees live in Cox's Bazar camps. International pressure mounts for sustainable repatriation to Myanmar. Bangladesh continues to coordinate with UN agencies for relief and education.",
-            "Global inflation and rising interest rates are cooling post-pandemic recovery. Bangladesh's central bank tightens monetary policy to stabilize the taka and control imported inflation, while remittances show resilience.",
-            "The FIFA World Cup 2026 will be hosted by USA, Canada, and Mexico. Cricket remains Bangladesh's sporting passion, with the national team aiming for semi-finals in the next ICC World Cup. Young cricketers inspire grassroots talent."
-        ];
+    // Keep track of used passages to avoid repetition
+    let usedPassages = {
+        english: [],
+        bangla: []
+    };
 
-        const bnTemplates = [
-            "বাংলাদেশ দক্ষিণ এশিয়ার একটি দ্রুত উন্নয়নশীল দেশ। ২০২৫ সালের মধ্যে ডিজিটাল অর্থনীতির প্রসার ও স্মার্ট বাংলাদেশ গড়ার লক্ষ্যে কাজ চলছে। পদ্মা সেতু ও মেট্রোরেল নগর যোগাযোগকে যুগান্তকারী করেছে।",
-            "কক্সবাজারের পর্যটন শিল্প বিশ্বের দীর্ঘতম সমুদ্র সৈকতকে কেন্দ্র করে প্রসারিত হচ্ছে। সাম্প্রতিক বছরগুলোতে সরকার পরিবেশবান্ধব পর্যটন ও প্লাস্টিকমুক্ত সৈকত কার্যক্রম গ্রহণ করেছে।",
-            "রোহিঙ্গা সংকট আন্তর্জাতিক অঙ্গনে বাংলাদেশের ভূমিকাকে গুরুত্বপূর্ণ করে তুলেছে। প্রায় ১১ লাখ বাস্তুচ্যুত রোহিঙ্গা এখন কক্সবাজারের ক্যাম্পে আশ্রিত। মানবিক সহায়তায় জাতিসংঘ ও বিভিন্ন দেশ কাজ করছে।",
-            "বাংলাদেশের অর্থনীতির মেরুদণ্ড তৈরি পোশাক শিল্প। সবুজ কারখানা ও টেকসই উৎপাদনে অভূতপূর্ব সাফল্য অর্জিত হয়েছে। পোশাক রপ্তানি আয় ২০২৪-২৫ সালে ৫০ বিলিয়ন ডলার ছাড়িয়ে যাওয়ার আশা করা হচ্ছে।",
-            "তরুণ উদ্যোক্তাদের হাত ধরে ফ্রিল্যান্সিং ও ই-কমার্স বিকাশ লাভ করছে। ঢাকার বাইরে চট্টগ্রাম, রাজশাহী ও সিলেটে আইটি পার্ক গড়ে উঠেছে। ডিজিটাল সেবা তরুণদের দক্ষতা বাড়াচ্ছে।",
-            "বাংলাদেশের শিক্ষা ব্যবস্থায় কারিগরি ও বৃত্তিমূলক শিক্ষার প্রসার ঘটছে। নতুন কারিকুলামে ব্যবহারিক ও সৃজনশীল শিক্ষার ওপর জোর দেওয়া হয়েছে। ২০২৫ সাল নাগাদ প্রতিটি উপজেলায় ডিজিটাল ল্যাব স্থাপন প্রকল্প বাস্তবায়িত হচ্ছে।",
-            "জলবায়ু পরিবর্তনের প্রভাব উপকূলীয় অঞ্চলে তীব্র। লবণাক্ততা ও ঘূর্ণিঝড় মোকাবেলায় স্থানীয় জনগণ অভিযোজিত কৃষি ও আশ্রয়কেন্দ্র নির্মাণ করেছে। বঙ্গবন্ধু উপকূলীয় সুরক্ষা প্রকল্প এই অঞ্চলের জীবনমান উন্নয়নে ভূমিকা রাখছে।",
-            "চট্টগ্রামের বন্দর ও মাতারবাড়ি গভীর সমুদ্র বন্দর আন্তর্জাতিক বাণিজ্যে নতুন সম্ভাবনা তৈরি করেছে। ট্রান্স-এশিয়ান রেলওয়ে করিডোরের সাথে সংযোগ স্থাপনের উদ্যোগ নেওয়া হয়েছে।",
-            "তথ্যপ্রযুক্তি রপ্তানি আয় বাড়ছে। 'লিভারেজিং আইসিটি' শীর্ষক সম্মেলনে বৈশ্বিক বিনিয়োগকারীরা বাংলাদেশের স্টার্টআপ ইকোসিস্টেমে আগ্রহ দেখিয়েছেন। ভোক্তা থেকে কর্পোরেট ডিজিটালাইজেশন দ্রুত সম্প্রসারিত হচ্ছে।"
-        ];
+    // Function to get a random, non-repeating passage
+    function getRandomPassage(lang) {
+        const pool = passagesData[lang];
+        let used = usedPassages[lang];
 
-        // Generate English >2000
-        for (let i = 0; i < 1500; i++) {
-            const base = enTemplates[i % enTemplates.length];
-            const suffix = ` (Global topic ${Math.floor(i/10)}): Digital transformation, green energy, and resilient economies. Bangladesh leads climate adaptation.`;
-            let newPassage = base + " " + suffix;
-            if (i % 3 === 0) newPassage = `Breakthrough ${i}: AI ethics and renewable energy investments surge. Bangladesh's green transition accelerates. ${base}`;
-            englishSet.add(newPassage);
-        }
-        while(englishSet.size < 2100) {
-            englishSet.add(`Unique passage #${englishSet.size}: The rapid adoption of 5G and IoT transforms smart cities. In Bangladesh, the government launches ‘Smart Bangladesh’ task force. Digital connectivity reaches remote villages.`);
+        // If all passages are used, reset the tracker
+        if (used.length >= pool.length) {
+            usedPassages[lang] = [];
+            used = usedPassages[lang];
         }
 
-        // Generate Bangla >1400
-        for (let i = 0; i < 1200; i++) {
-            const baseBn = bnTemplates[i % bnTemplates.length];
-            const addon = ` বাংলাদেশের উন্নয়নশীল অর্থনীতি ও প্রযুক্তি খাত ${i}. ডিজিটাল উদ্ভাবন ও জলবায়ু সহনশীলতা দেশের অগ্রগতিতে গুরুত্বপূর্ণ ভূমিকা রাখছে।`;
-            let newBn = baseBn + " " + addon;
-            if (i % 4 === 1) newBn = `আন্তর্জাতিক বাণিজ্য ও বিনিয়োগ পরিস্থিতি ${i}: বাংলাদেশ বিদেশি বিনিয়োগ আকর্ষণে বিশেষ অর্থনৈতিক অঞ্চল স্থাপন করেছে। ${baseBn}`;
-            banglaSet.add(newBn);
-        }
-        while(banglaSet.size < 1500) {
-            banglaSet.add(`অনন্য বাংলা অনুচ্ছেদ ${banglaSet.size}: স্মার্ট বাংলাদেশ নির্মাণে তথ্যপ্রযুক্তি, নবায়নযোগ্য জ্বালানি ও দক্ষ মানবসম্পদ উন্নয়ন জরুরি। জাতীয় বাজেটে এসব খাতে বরাদ্দ বৃদ্ধি পেয়েছে।`);
-        }
-
-        return { en: Array.from(englishSet), bn: Array.from(banglaSet) };
-    }
-
-    const basePools = generateLargePassagePool();
-    const ENGLISH_BASE = basePools.en;
-    const BANGLA_BASE = basePools.bn;
-    document.getElementById("passageCountBadge").innerHTML = `📚 ${ENGLISH_BASE.length + BANGLA_BASE.length}+ base passages`;
-
-    function getNonSpaceLen(str) {
-        return (str.match(/[^ ]/g) || []).length;
-    }
-
-    // Required minimum non‑space characters for a 70 WPM typist to not finish early
-    function getRequiredMinLength(minutes) {
-        return 70 * 5 * minutes;   // 350 chars per minute
-    }
-
-    // Build passage by concatenating random base passages until length >= required
-    let lastUsedFullPassage = { english: null, bangla: null };
-
-    function buildLongPassage(lang, minutes) {
-        const baseArray = lang === 'english' ? ENGLISH_BASE : BANGLA_BASE;
-        const required = getRequiredMinLength(minutes);
-        let parts = [];
-        let totalNonSpace = 0;
-        let usedIndices = new Set();
-        let attempts = 0;
-        const maxAttempts = 100;
+        // Find available indices
+        let availableIndices = pool.map((_, index) => index).filter(index => !used.includes(index));
         
-        while (totalNonSpace < required && attempts < maxAttempts) {
-            let idx;
-            do {
-                idx = Math.floor(Math.random() * baseArray.length);
-            } while (usedIndices.has(idx));
-            const chosen = baseArray[idx];
-            usedIndices.add(idx);
-            parts.push(chosen);
-            totalNonSpace += getNonSpaceLen(chosen);
-            attempts++;
-            if (usedIndices.size >= baseArray.length * 0.8) usedIndices.clear();
-        }
-        let finalText = parts.join("  ");
-        // Avoid immediate repetition of the exact same concatenation
-        const last = lastUsedFullPassage[lang];
-        if (last === finalText && baseArray.length > 1) {
-            if (parts.length >= 2) {
-                [parts[0], parts[1]] = [parts[1], parts[0]];
-                finalText = parts.join("  ");
+        // Pick a random index
+        let randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        
+        // Mark as used
+        used.push(randomIndex);
+
+        return pool[randomIndex];
+    }
+
+    // ==========================================
+    // CORE LOGIC
+    // ==========================================
+
+    let currentLang = '';
+    let totalTime = 0; // in seconds
+    let timeLeft = 0;
+    let timerInterval = null;
+    let isTestRunning = false;
+    let originalText = "";
+
+    const dashboardView = document.getElementById('dashboard-view');
+    const typingView = document.getElementById('typing-view');
+    const resultView = document.getElementById('result-view');
+    const passageBox = document.getElementById('original-passage');
+    const userInput = document.getElementById('user-input');
+    const timerDisplay = document.getElementById('timer-display');
+
+    window.onload = loadHistory;
+
+    function startTest(lang, minutes) {
+        currentLang = lang;
+        totalTime = minutes * 60;
+        timeLeft = totalTime;
+        
+        // Fetch a random passage dynamically
+        originalText = getRandomPassage(lang);
+
+        // UI Setup
+        dashboardView.style.display = 'none';
+        resultView.style.display = 'none';
+        typingView.style.display = 'block';
+        
+        passageBox.innerText = originalText;
+        userInput.value = '';
+        userInput.disabled = false;
+        userInput.focus();
+        
+        updateTimerDisplay();
+        
+        isTestRunning = true;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                finishTest();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        timerDisplay.innerText = `সময়: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s} মিনিট`;
+    }
+
+    function finishTest() {
+        if (!isTestRunning) return;
+        isTestRunning = false;
+        clearInterval(timerInterval);
+        userInput.disabled = true;
+
+        calculateAndShowResult();
+    }
+
+    function calculateAndShowResult() {
+        const typedText = userInput.value.trim();
+        const timeSpentSec = totalTime - Math.max(0, timeLeft);
+        const timeSpentMin = timeSpentSec / 60;
+
+        const origWords = originalText.split(/\s+/);
+        const typedWords = typedText.split(/\s+/);
+        
+        let correctChars = 0;
+        let wrongWordsCount = 0;
+        let highlightedHTML = "";
+
+        for (let i = 0; i < typedWords.length; i++) {
+            if (typedWords[i] === "") continue;
+
+            if (origWords[i] && typedWords[i] === origWords[i]) {
+                correctChars += typedWords[i].length + 1; 
+                highlightedHTML += typedWords[i] + " ";
+            } else {
+                wrongWordsCount++;
+                highlightedHTML += `<span class="error-text">${typedWords[i]}</span> `;
             }
         }
-        lastUsedFullPassage[lang] = finalText;
-        return finalText;
-    }
 
-    // --------------------------------------------------------------
-    // APP STATE
-    // --------------------------------------------------------------
-    let currentLang = "english";
-    let currentDurationMin = 3;
-    let timeLeftSeconds = 180;
-    let testActive = false;
-    let currentPassageText = "";
-    let timerInterval = null, wpmInterval = null;
-    let testHistory = [];
-
-    // DOM elements
-    const passageDisplayDiv = document.getElementById("passageDisplay");
-    const userTextarea = document.getElementById("userInput");
-    const startBtn = document.getElementById("startTestBtn");
-    const showErrorsBtn = document.getElementById("showErrorsBtn");
-    const timerSpan = document.getElementById("timerDisplay");
-    const liveWpmSpan = document.getElementById("liveWpm");
-    const resultPanel = document.getElementById("resultPanel");
-    const resultDetails = document.getElementById("resultDetails");
-    const historyBody = document.getElementById("historyBody");
-    const deleteAllBtn = document.getElementById("deleteAllHistoryBtn");
-    const closeResult = document.getElementById("closeResultBtn");
-    const errorPanel = document.getElementById("errorHighlightPanel");
-    const closeErrorPanel = document.getElementById("closeErrorPanel");
-    const errorComparisonContent = document.getElementById("errorComparisonContent");
-
-    function refreshPassage() {
-        if (!testActive) {
-            currentPassageText = buildLongPassage(currentLang, currentDurationMin);
-            passageDisplayDiv.innerText = currentPassageText;
+        const totalTypedChars = typedText.length;
+        let wpm = 0;
+        if (timeSpentMin > 0) {
+            wpm = Math.round((correctChars / 5) / timeSpentMin);
         }
-    }
+        
+        let accuracy = 0;
+        if (totalTypedChars > 0) {
+            accuracy = Math.round((correctChars / totalTypedChars) * 100);
+            if(accuracy > 100) accuracy = 100;
+        }
 
-    function setLanguage(lang) {
-        if (testActive) return;
-        currentLang = lang;
-        document.querySelectorAll("[data-lang]").forEach(chip => {
-            if (chip.getAttribute("data-lang") === lang) chip.classList.add("active");
-            else chip.classList.remove("active");
+        document.getElementById('res-lang').innerText = currentLang.toUpperCase();
+        
+        let m = Math.floor(timeSpentSec / 60);
+        let s = timeSpentSec % 60;
+        document.getElementById('res-time').innerText = `${m} Min ${s} Sec`;
+        
+        document.getElementById('res-wpm').innerText = wpm;
+        document.getElementById('res-acc').innerText = accuracy + '%';
+        document.getElementById('res-total-char').innerText = totalTypedChars;
+        document.getElementById('res-correct-char').innerText = correctChars;
+        document.getElementById('res-wrong-words').innerText = wrongWordsCount;
+        document.getElementById('comparison-output').innerHTML = highlightedHTML || "<em>কোনো টেক্সট ইনপুট দেওয়া হয়নি।</em>";
+
+        saveResult({
+            date: new Date().toLocaleString(),
+            lang: currentLang,
+            wpm: wpm,
+            accuracy: accuracy,
+            timeSpent: `${m}m ${s}s`,
+            status: accuracy >= 80 ? 'PASS' : 'FAIL'
         });
-        refreshPassage();
-        clearResultAndError();
-        disableTypingReset();
+
+        typingView.style.display = 'none';
+        resultView.style.display = 'block';
     }
 
-    function setDuration(minutes) {
-        if (testActive) return;
-        currentDurationMin = minutes;
-        document.querySelectorAll("[data-time]").forEach(chip => {
-            if (parseInt(chip.getAttribute("data-time")) === minutes) chip.classList.add("active");
-            else chip.classList.remove("active");
+    function saveResult(resultObj) {
+        let history = JSON.parse(localStorage.getItem('typingHistory')) || [];
+        history.unshift(resultObj); 
+        localStorage.setItem('typingHistory', JSON.stringify(history));
+    }
+
+    function loadHistory() {
+        let history = JSON.parse(localStorage.getItem('typingHistory')) || [];
+        const tbody = document.getElementById('history-table-body');
+        tbody.innerHTML = '';
+
+        if(history.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">No results found</td></tr>';
+            return;
+        }
+
+        history.forEach(item => {
+            let statusColor = item.status === 'PASS' ? 'var(--success)' : 'var(--danger)';
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.date}</td>
+                <td style="text-transform: capitalize;">${item.lang}</td>
+                <td>${item.wpm}</td>
+                <td>${item.accuracy}%</td>
+                <td>${item.timeSpent}</td>
+                <td style="color: ${statusColor}; font-weight: bold;">${item.status}</td>
+            `;
+            tbody.appendChild(tr);
         });
-        timeLeftSeconds = minutes * 60;
-        updateTimerUI();
-        refreshPassage();   // new, sufficiently long passage
-        clearResultAndError();
-        disableTypingReset();
     }
 
-    function updateTimerUI() {
-        let mins = Math.floor(timeLeftSeconds / 60);
-        let secs = timeLeftSeconds % 60;
-        timerSpan.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function computeStats(typed, original, minutesElapsed) {
-        const originalWords = original.trim().split(/\s+/);
-        const typedWords = typed.trim().split(/\s+/);
-        let correctWords = 0;
-        const minLen = Math.min(originalWords.length, typedWords.length);
-        for (let i = 0; i < minLen; i++) if (originalWords[i] === typedWords[i]) correctWords++;
-        let wrongWords = (originalWords.length - correctWords) + Math.max(0, typedWords.length - originalWords.length);
-        let wrongPercent = (wrongWords / originalWords.length) * 100;
-        let accuracy = 100 - wrongPercent;
-        accuracy = Math.min(100, Math.max(0, Math.round(accuracy * 10) / 10));
-        wrongPercent = Math.round(wrongPercent * 10) / 10;
-        const maxLen = Math.min(typed.length, original.length);
-        let correctNonSpace = 0;
-        for (let i = 0; i < maxLen; i++) {
-            if (typed[i] === original[i] && typed[i] !== ' ' && original[i] !== ' ') correctNonSpace++;
+    function clearHistory() {
+        if(confirm("Are you sure you want to delete all results?")) {
+            localStorage.removeItem('typingHistory');
+            loadHistory();
         }
-        let wpm = (correctNonSpace / 5) / minutesElapsed;
-        wpm = Math.round(wpm * 10) / 10;
-        if (isNaN(wpm)) wpm = 0;
-        return { wpm, accuracy, wrongWords, wrongPercent, totalWords: originalWords.length };
     }
 
-    function generateErrorHtml(typed, original) {
-        let originalRich = "";
-        for (let i = 0; i < original.length; i++) {
-            const origChar = original[i];
-            const typedChar = i < typed.length ? typed[i] : null;
-            if (typedChar === null) originalRich += `<span class="missing-highlight" title="missing typed character">${escapeHtml(origChar)}</span>`;
-            else if (origChar === typedChar) originalRich += escapeHtml(origChar);
-            else originalRich += `<span class="highlight-error" title="mismatch: typed '${escapeHtml(typedChar)}'">${escapeHtml(origChar)}</span>`;
-        }
-        if (typed.length > original.length) {
-            originalRich += `<span class="extra-highlight" title="extra characters typed">${escapeHtml(typed.slice(original.length))}</span>`;
-        }
-        return `<div style="font-family:'Times New Roman', Times, serif; font-size:1.2rem;">
-            <div style="background:#fef2e0; padding:1rem; border-radius:1rem;">${originalRich}</div>
-            <div style="margin-top:0.8rem;"><strong>✍️ Your typed text:</strong><br><span style="background:#f5f5f5; padding:0.5rem; display:inline-block;">${escapeHtml(typed) || '(empty)'}</span></div>
-            </div>`;
+    function goHome() {
+        resultView.style.display = 'none';
+        dashboardView.style.display = 'block';
+        loadHistory();
     }
-
-    function showErrorHighlight(typed, original) {
-        if (!original) return;
-        errorComparisonContent.innerHTML = generateErrorHtml(typed, original);
-        errorPanel.style.display = "block";
-    }
-
-    function endTest() {
-        if (!testActive) return;
-        testActive = false;
-        if (timerInterval) clearInterval(timerInterval);
-        if (wpmInterval) clearInterval(wpmInterval);
-        const typed = userTextarea.value;
-        const original = currentPassageText;
-        const { wpm, accuracy, wrongWords, wrongPercent, totalWords } = computeStats(typed, original, currentDurationMin);
-        const passed = accuracy >= 96.0;
-        
-        resultPanel.style.display = "block";
-        resultDetails.innerHTML = `<div class="result-flex"><div class="stat-pill">⚡ WPM: ${wpm}</div><div class="stat-pill">🎯 Accuracy: ${accuracy}%</div><div class="stat-pill">❌ Wrong words: ${wrongWords}</div><div class="stat-pill">⚠️ Error %: ${wrongPercent}%</div><div class="stat-pill">📄 Words: ${totalWords}</div></div><div class="verdict-big ${passed ? 'pass' : 'fail'}">${passed ? '✅ PASS · Excellent!' : '❌ FAIL · Keep practicing'}</div>`;
-        
-        // Automatically show error highlight panel
-        showErrorHighlight(typed, original);
-        
-        const now = new Date();
-        const dateStr = `${now.toLocaleDateString()} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        testHistory.unshift({ datetime: dateStr, language: currentLang === 'english' ? 'English' : 'বাংলা', wpm, accuracy, wrongWords, wrongPercent, result: passed ? 'PASS' : 'FAIL' });
-        if (testHistory.length > 20) testHistory.pop();
-        renderHistory();
-        
-        userTextarea.disabled = true;
-        enableControls(true);
-        startBtn.disabled = false;
-        liveWpmSpan.innerText = "0";
-    }
-
-    function renderHistory() {
-        if (!testHistory.length) { historyBody.innerHTML = '<tr><td colspan="7">✨ No attempts yet. Start a test!</td></tr>'; return; }
-        let html = "";
-        testHistory.forEach(h => { html += `<tr><td>${h.datetime}</td><td>${h.language}</td><td>${h.wpm}</td><td>${h.accuracy}%</td><td>${h.wrongWords}</td><td>${h.wrongPercent}%</td><td style="color:${h.result === 'PASS' ? '#0b5e42' : '#b91c1c'}">${h.result}</td></tr>`; });
-        historyBody.innerHTML = html;
-    }
-
-    function deleteAllHistory() { testHistory = []; renderHistory(); }
-    function clearResultAndError() { resultPanel.style.display = "none"; errorPanel.style.display = "none"; }
-    function disableTypingReset() { if (!testActive) { userTextarea.disabled = true; userTextarea.value = ""; } }
-    function enableControls(enable) {
-        document.querySelectorAll("[data-lang], [data-time]").forEach(c => c.style.pointerEvents = enable ? "auto" : "none");
-        showErrorsBtn.disabled = !enable;
-    }
-
-    function updateLiveWpm() {
-        if (!testActive) return;
-        const typed = userTextarea.value, original = currentPassageText;
-        const elapsed = currentDurationMin - (timeLeftSeconds / 60);
-        if (elapsed <= 0) { liveWpmSpan.innerText = "0"; return; }
-        const maxLen = Math.min(typed.length, original.length);
-        let correctNonSpace = 0;
-        for (let i = 0; i < maxLen; i++) if (typed[i] === original[i] && typed[i] !== ' ' && original[i] !== ' ') correctNonSpace++;
-        let w = (correctNonSpace / 5) / elapsed;
-        w = Math.round(w * 10) / 10;
-        liveWpmSpan.innerText = (isNaN(w) ? 0 : w);
-    }
-
-    function startNewTest() {
-        if (testActive) return;
-        if (timerInterval) clearInterval(timerInterval);
-        if (wpmInterval) clearInterval(wpmInterval);
-        timeLeftSeconds = currentDurationMin * 60;
-        updateTimerUI();
-        currentPassageText = buildLongPassage(currentLang, currentDurationMin);
-        passageDisplayDiv.innerText = currentPassageText;
-        userTextarea.disabled = false;
-        userTextarea.value = "";
-        userTextarea.focus();
-        liveWpmSpan.innerText = "0";
-        clearResultAndError();
-        testActive = true;
-        enableControls(false);
-        startBtn.disabled = true;
-        timerInterval = setInterval(() => {
-            if (!testActive) return;
-            if (timeLeftSeconds <= 1) { clearInterval(timerInterval); if(wpmInterval) clearInterval(wpmInterval); timeLeftSeconds=0; updateTimerUI(); endTest(); }
-            else { timeLeftSeconds--; updateTimerUI(); }
-        }, 1000);
-        wpmInterval = setInterval(() => { if(testActive) updateLiveWpm(); }, 400);
-    }
-
-    function manualHighlight() {
-        if (!currentPassageText) return;
-        showErrorHighlight(userTextarea.value, currentPassageText);
-    }
-
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-    // Event listeners
-    document.querySelectorAll("[data-lang]").forEach(el => {
-        el.addEventListener("click", () => setLanguage(el.getAttribute("data-lang")));
-    });
-    document.querySelectorAll("[data-time]").forEach(el => {
-        el.addEventListener("click", () => setDuration(parseInt(el.getAttribute("data-time"))));
-    });
-    startBtn.addEventListener("click", startNewTest);
-    deleteAllBtn.addEventListener("click", deleteAllHistory);
-    closeResult.addEventListener("click", () => resultPanel.style.display = "none");
-    closeErrorPanel.addEventListener("click", () => errorPanel.style.display = "none");
-    showErrorsBtn.addEventListener("click", manualHighlight);
-
-    // Initialization
-    setLanguage("english");
-    setDuration(3);
-    disableTypingReset();
-    enableControls(true);
-    renderHistory();
 </script>
+
 </body>
 </html>
